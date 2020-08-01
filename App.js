@@ -7,6 +7,7 @@ import LoginScreenComponent from './src/LoginScreenComponent';
 
 export default function App() {
   const [userLoggedIn , setUserLoggedIn] = useState("false")
+  
   if(firebase.apps.length === 0){
     var firebaseConfig = {
       apiKey: "AIzaSyDsPw3lvAuYtstAy1ROerDU46w3IdoMiPk",

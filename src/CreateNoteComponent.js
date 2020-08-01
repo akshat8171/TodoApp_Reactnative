@@ -1,9 +1,9 @@
 import React, {useState} from 'react';
 import {StyleSheet, TextInput, Button, View} from 'react-native'
-
+import firebase from 'firebase';
 
 const CreateNoteComponent = (props) => {
-    //console.log(props)
+    console.log(props)
     const [newNoteText, setNewNoteText] = useState('')
 
     return <View>
@@ -13,13 +13,30 @@ const CreateNoteComponent = (props) => {
         autoCapitalize="none"
         multiline={true}
         value={newNoteText}
-        onChangeText={(currentText) => setNewNoteText(currentText)}
+        onChangeText={(currentText) => {
+                setNewNoteText(currentText)
+
+        }
+        }
         />
         <Button
             title={"Create Note"}
             onPress={() => {
-                props.onCreateButtonPress(newNoteText)
-                setNewNoteText('')
+                // Store the text on firebase as well
+                // /users/{id}/
+                if(newNoteText !== '') {
+                    const loggedInUserId = firebase.auth().currentUser.uid
+                    const pathForData = `/users/${loggedInUserId}/`
+
+                    firebase.database()
+                        .ref(pathForData)
+                        .push({
+                            'date': new Date().toDateString(),
+                            'text': newNoteText
+                        })
+                    setNewNoteText('')
+                }
+
             }}
         />
     </View>
@@ -28,13 +45,12 @@ const CreateNoteComponent = (props) => {
 
 const styles = StyleSheet.create({
     textInputStyles: {
-        margin:10,
-        padding:10,
         borderWidth: 5,
-        width: 350,
+        width: 320,
         height: 140,
-        justifyContent: 'center',
-        borderRadius: 10
+        borderRadius: 10,
+        padding: 15,
+        fontSize: 30
     }
 });
 

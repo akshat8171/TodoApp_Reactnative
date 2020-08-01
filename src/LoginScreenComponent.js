@@ -7,7 +7,6 @@ const LoginScreenComponent = () => {
   const [email, setEmail]= useState("");
   const [password,setPassword] = useState("")
 
-
     return <View>
         <Text> Email: </Text>
         <TextInput
@@ -47,7 +46,7 @@ const LoginScreenComponent = () => {
                 setPassword("")
               })
               .catch(() => {
-                console.log("Some error")
+                alert("Your file is being uploaded!")
               })
           }
         }

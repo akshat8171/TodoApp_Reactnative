@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import  {Text, FlatList, View, StyleSheet, TextInput ,Button}  from 'react-native';
+import React, { useState, useEffect } from 'react';
+import  {Text, FlatList, View, StyleSheet, TextInput, Button}  from 'react-native';
 import SingleNoteSummaryComponent from './SingleNoteSummaryComponent';
 import CreateNoteComponent from './CreateNoteComponent';
-import firebase from 'firebase';
+import firebase from 'firebase'
+import _ from 'lodash'
 // a react component is nothing but a javascript function
 
 const NotesScreenComponent = () => {
@@ -22,19 +23,49 @@ const NotesScreenComponent = () => {
     // {name: 'abc', 'age': 12} -> {name} -> {name: 'abc'}
     // item , index
 
+    // /users/{id}/
+
+    const loggedInUserId = firebase.auth().currentUser.uid
+
+    useEffect(() => {firebase.database()
+        .ref(`/users/${loggedInUserId}/`)
+        .on('value', (completeNewData) => {
+            console.log(completeNewData)
+
+            const newDataList = _.map(completeNewData.val(), (value, key) => {
+                console.log("Value", value)
+                console.log("Key", key)
+                return {...value}
+            })
+
+            console.log(newDataList)
+            setData(newDataList.reverse())
+        }
+    )}, [])
+
+
+
+
+
+
     const addNewNote = (text) => {
-      if(text.length>0){
-        setData([ {"text": text, "date": new Date()},...data])
-}
+        if(text.length > 0){
+            setData([{"text": text, "date": new Date()}, ...data])
+        }
+
+
         // A= ['a', 'b', 'c', 'd'] -> ...A -> 'a', 'b', 'c', 'd'
     }
 
 
     return <View style={styles.viewProperties}>
 
-      <Button title={"Log Out"} onPress={() => {
-          firebase.auth().signOut()
-        }}/>
+        <Button
+            title={"Log Out"}
+            onPress={() => firebase.auth().signOut()}
+        />
+
+
         <CreateNoteComponent onCreateButtonPress={
             (text) => addNewNote(text)
         }/>
@@ -68,8 +99,6 @@ const styles = StyleSheet.create({
         fontSize: 24
     },
     textViewStyle: {
-        height: 150,
-        width: 150,
         margin: 10,
         borderRadius: 10,
         padding: 5,
@@ -77,6 +106,18 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     }
 });
+
+const randomBackground = () => {
+    var red = Math.floor(Math.random() * 255) // 123
+    var green = Math.floor(Math.random() * 255) // 45
+    var blue = Math.floor(Math.random() * 255) // 43
+
+    // String Interpolation
+    // In a string -> isnert a value of some other data type
+    // ""  ''  ``
+
+    return `rgb(${red}, ${green}, ${blue})` // rgb(123, 45, 43)
+}
 
 export default NotesScreenComponent;
 
@@ -105,3 +146,29 @@ export default NotesScreenComponent;
 
 
 // If we have to write JS in JSX, we need to surround JS code in {}
+
+
+
+
+
+// Object {
+//     "-MD_0ehQ55AEBBlQzmRJ": Object {
+//       "date": "Fri Jul 31 2020",
+//       "text": "yooooo",
+//     },
+//     "-MD_0sYGRokDygxRNusJ": Object {
+//       "date": "Fri Jul 31 2020",
+//       "text": "another note",
+//     },
+//   }
+
+// [
+    // {
+        //       "date": "Fri Jul 31 2020",
+        //       "text": "yooooo",
+        //     },
+        // {
+            //       "date": "Fri Jul 31 2020",
+            //       "text": "another note",
+            //     },
+// ]
